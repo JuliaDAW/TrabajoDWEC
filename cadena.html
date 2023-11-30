@@ -4,9 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="index.js" defer></script>
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
     <script src="cadena.js" defer></script>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div id="cadena"></div>
+    <form action="">
+        <div>
+            <input type="text" name="nombre" placeholder="Nombre">
+        </div>
+        <div>
+            <input type="text" name="precio" placeholder="Precio">
+        </div>
+
+        <div id="ingredientes">
+            <input type="text" name="ingredientes[]" placeholder="Ingrediente">
+            <button id="btn_add">Añadir ingrediente</button>
+            <button id="btn_rmv">Eliminar Ingrediente</button>
+        </div>
+        Imagen:<input type="file" name="image" accept="image/*">
+        <input type="submit" value="Enviar">
+    </form>
 </body>
 </html>

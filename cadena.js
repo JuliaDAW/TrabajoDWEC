@@ -1,4 +1,4 @@
-const jsConfetti = new JSConfetti();
+
 if(!window.indexedDB){
     console.log("Tu navegador no soporta IndexedDB");
 }
@@ -19,6 +19,7 @@ request.onsuccess = function (event) {
     //Añadir
     let aniadir=document.getElementById("id_aniadir");
     if(aniadir){
+        const jsConfetti = new JSConfetti();
         document.getElementById("id_aniadir").addEventListener("submit", (event)=>{
             event.preventDefault();
 

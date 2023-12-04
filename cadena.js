@@ -45,23 +45,42 @@ request.onsuccess = function (event) {
                 console.log(datos.value);
                 array.push(datos.value);
                 datos.continue();
+            } else{
+                let elegir=document.getElementById("id_elegir");
+                array.forEach(comida =>{
+                    elegir.innerHTML+=`<option value=${comida.id}>${comida.nombre}</option>`;
+                    console.log(comida);
+                });
+
+                elegir.addEventListener("change", (event)=>{
+                    let aux=event.target.value;
+        
+                    let encontrada=array.find(comida=>{
+                        return comida.id==aux;
+                    })
+
+                    modificar.nombre.value=encontrada.nombre;
+                    modificar.precio.value=encontrada.precio;
+                    modificar.ingredientes.value=encontrada.ingredientes;
+                    modificar.image.value=encontrada.imagen;
+
+                    modificar.nombre.disabled=false;
+                    modificar.precio.disabled=false;
+                    modificar.ingredientes.disabled=false;
+                    modificar.image.disabled=false;
+                    modificar.modifica.disabled=false;
+                });
             }
         }
-console.log(array);
-        let elegir=document.getElementById("id_elegir");
-        array.forEach(comida =>{
-            elegir.innerHTML+=`<option value=${comida.id}>${comida.nombre}</option>`;
-            console.log(comida);
-        });
 
-        document.getElementById("id_modificar").addEventListener("submit", (event)=>{
+        modificar.addEventListener("submit", (event)=>{
             event.preventDefault();
     
-            let transaction = db.transaction(["platos"], "readwrite");
+            let transaction1 = db.transaction(["platos"], "readwrite");
     
-            let objectStore = transaction.objectStore("platos");
+            let objectStore1 = transaction1.objectStore("platos");
     
-            objectStore.put({id: modificar.elegir.value, nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value});
+            objectStore1.put({id: parseInt(modificar.elegir.value), nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value});
             console.log({id: modificar.elegir.value, nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value});
         });
     }

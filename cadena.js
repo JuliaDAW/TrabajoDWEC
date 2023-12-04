@@ -85,12 +85,6 @@ request.onsuccess = function (event) {
         });
     }
 
-    /* Ejemplos de add
-        objectStore.add({ id: 1, nombre: "Macarrones", precio: 10, ingredientes: "Arroz, pollo, verduras", imagen: "img/paella.jpg" });
-        objectStore.add({ id: 2, nombre: "Paella", precio: 10, ingredientes: "Arroz, pollo, verduras", imagen: "img/paella.jpg" });
-    */
-    //put
-    //objectStore.put({ id: 2, nombre: "Paella", precio: 20, ingredientes: "Arroz, pollo, verduras", imagen: "img/paella.jpg" });
     //get
     /*let peticion = objectStore.get(2);
     peticion.onsuccess=function(event){

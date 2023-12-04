@@ -69,6 +69,7 @@ request.onsuccess = function (event) {
                     modificar.ingredientes.disabled=false;
                     modificar.image.disabled=false;
                     modificar.modifica.disabled=false;
+                    modificar.elimina.disabled=false;
                 });
             }
         }
@@ -82,6 +83,16 @@ request.onsuccess = function (event) {
     
             objectStore1.put({id: parseInt(modificar.elegir.value), nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value});
             console.log({id: modificar.elegir.value, nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value});
+        });
+
+        modificar.elimina.addEventListener("click", (event)=>{
+            event.preventDefault();
+
+            let transaction1 = db.transaction(["platos"], "readwrite");
+    
+            let objectStore1 = transaction1.objectStore("platos");
+
+            objectStore1.delete(modificar.elegir.value);
         });
     }
 

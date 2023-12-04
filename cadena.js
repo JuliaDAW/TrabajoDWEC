@@ -1,3 +1,4 @@
+const jsConfetti = new JSConfetti();
 if(!window.indexedDB){
     console.log("Tu navegador no soporta IndexedDB");
 }
@@ -13,7 +14,7 @@ request.onerror = function (event) {
 //Apertura exitosa
 request.onsuccess = function (event) {
     console.log("Base de datos abierta corréctamente: ", request.result);
-    db = event.target.result;
+    const db = event.target.result;
 
     //Añadir
     let aniadir=document.getElementById("id_aniadir");
@@ -27,6 +28,14 @@ request.onsuccess = function (event) {
 
             objectStore.add({nombre: aniadir.nombre.value, precio: aniadir.precio.value, ingredientes: aniadir.ingredientes.value, imagen: aniadir.image.value});
             console.log({nombre: aniadir.nombre.value, precio: aniadir.precio.value, ingredientes: aniadir.ingredientes.value, imagen: aniadir.image.value});
+            transaction.oncomplete = function(event) {
+                if(jsConfetti) jsConfetti.clearCanvas();
+                jsConfetti.addConfetti({
+                    emojis: ['🐸', '🍙', '🍖', '🍶', '🍻'],
+                    emojiSize: 50,
+                    confettiNumber: 80,
+                });
+            }
         });
     }
 
@@ -47,7 +56,7 @@ request.onsuccess = function (event) {
                 datos.continue();
             }
         }
-console.log(array);
+        console.log(array);
         let elegir=document.getElementById("id_elegir");
         array.forEach(comida =>{
             elegir.innerHTML+=`<option value=${comida.id}>${comida.nombre}</option>`;

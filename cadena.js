@@ -2,6 +2,9 @@ if(!window.indexedDB){
     console.log("Tu navegador no soporta IndexedDB");
 }
 
+let aniadir=document.getElementById("id_aniadir");
+let modificar=document.getElementById("id_modificar");
+
 // Abrir o crear la base de datos
 const request = window.indexedDB.open("BD_Practica_5", 3);
 
@@ -16,7 +19,6 @@ request.onsuccess = function (event) {
     const db = event.target.result;
 
     //Añadir
-    let aniadir=document.getElementById("id_aniadir");
     if(aniadir){
         const jsConfetti = new JSConfetti();
         document.getElementById("id_aniadir").addEventListener("submit", (event)=>{
@@ -43,7 +45,6 @@ request.onsuccess = function (event) {
     }
 
     //Modificar y eliminar
-    let modificar=document.getElementById("id_modificar");
     if(modificar){
         const jsConfetti = new JSConfetti();
 
@@ -51,40 +52,8 @@ request.onsuccess = function (event) {
     
         let objectStore = transaction.objectStore("platos");
 
-        let array=[];
         let cursor = objectStore.openCursor();
-        cursor.onsuccess = function(event){
-            let datos = event.target.result;
-            if(datos){
-                array.push(datos.value);
-                datos.continue();
-            } else{
-                let elegir=document.getElementById("id_elegir");
-                array.forEach(comida =>{
-                    elegir.innerHTML+=`<option value=${comida.id}>${comida.nombre}</option>`;
-                });
-
-                elegir.addEventListener("change", (event)=>{
-                    let aux=event.target.value;
-        
-                    let encontrada=array.find(comida=>{
-                        return comida.id==aux;
-                    })
-
-                    modificar.nombre.value=encontrada.nombre;
-                    modificar.precio.value=encontrada.precio;
-                    modificar.ingredientes.value=encontrada.ingredientes;
-                    modificar.image.value=encontrada.imagen;
-
-                    modificar.nombre.disabled=false;
-                    modificar.precio.disabled=false;
-                    modificar.ingredientes.disabled=false;
-                    modificar.image.disabled=false;
-                    modificar.modifica.disabled=false;
-                    modificar.elimina.disabled=false;
-                });
-            }
-        }
+        select(cursor);
         
         modificar.addEventListener("submit", (event)=>{ //botón modificar
             event.preventDefault();
@@ -97,6 +66,7 @@ request.onsuccess = function (event) {
             console.log({id: modificar.elegir.value, nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value});
 
             transaction1.oncomplete = function(event) { //transacción exitosa
+                db.close();
                 if(jsConfetti) jsConfetti.clearCanvas();
                 jsConfetti.addConfetti({
                     emojis: ['🐸', '🍙', '🍖', '🍶', '🍻'],
@@ -118,11 +88,12 @@ request.onsuccess = function (event) {
             let peticion = objectStore1.get(parseInt(modificar.elegir.value));
             peticion.onsuccess = function(event){
                 objectStore1.delete(event.target.result.id); //elimina datos
+                let cursor = objectStore1.openCursor();
+                select(cursor);
             }
             
-            //hacer que la página se actualice sola
-
             transaction1.oncomplete = function(event) { //transacción exitosa
+                db.close();
                 if(jsConfetti) jsConfetti.clearCanvas();
                 jsConfetti.addConfetti({
                     emojis: ['🐸', '🍙', '🍖', '🍶', '🍻'],
@@ -135,6 +106,45 @@ request.onsuccess = function (event) {
         });
     }
 };
+
+function select(cursor){
+    let array=[];
+        cursor.onsuccess = function(event){
+            let datos = event.target.result;
+            if(datos){
+                console.log(datos.value);
+                array.push(datos.value);
+                datos.continue();
+            } else{
+                let elegir=document.getElementById("id_elegir");
+                elegir.innerHTML="<option>--Seleccione una opción--</option>";
+                array.forEach(comida =>{
+                    elegir.innerHTML+=`<option value=${comida.id}>${comida.nombre}</option>`;
+                });
+
+                elegir.addEventListener("change", (event)=>{
+                    let aux=event.target.value;
+                    console.log(array);
+        
+                    let encontrada=array.find(comida=>{
+                        return comida.id==aux;
+                    })
+
+                    modificar.nombre.value=encontrada.nombre;
+                    modificar.precio.value=encontrada.precio;
+                    modificar.ingredientes.value=encontrada.ingredientes;
+                    modificar.image.value=encontrada.imagen;
+
+                    modificar.nombre.disabled=false;
+                    modificar.precio.disabled=false;
+                    modificar.ingredientes.disabled=false;
+                    modificar.image.disabled=false;
+                    modificar.modifica.disabled=false;
+                    modificar.elimina.disabled=false;
+                });
+            }
+        }
+}
 
 // Este evento solo se ejecuta en la primera creación de la base de datos o en el cambio de versión
 request.onupgradeneeded = function (event) {

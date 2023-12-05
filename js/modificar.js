@@ -1,3 +1,5 @@
+const jsConfetti = new JSConfetti();
+
 if(!window.indexedDB){
     console.log("Tu navegador no soporta IndexedDB");
 }
@@ -18,101 +20,71 @@ request.onsuccess = function (event) {
     console.log("Base de datos abierta corréctamente: ", request.result);
     const db = event.target.result;
 
-    //Añadir
-    if(aniadir){
-        const jsConfetti = new JSConfetti();
-        document.getElementById("id_aniadir").addEventListener("submit", (event)=>{
-            event.preventDefault();
-
-            let transaction = db.transaction(["platos"], "readwrite");
-
-            let objectStore = transaction.objectStore("platos");
-
-            objectStore.add({nombre: aniadir.nombre.value, precio: aniadir.precio.value, ingredientes: aniadir.ingredientes.value, imagen: aniadir.image.value}); //añade datos
-            console.log({nombre: aniadir.nombre.value, precio: aniadir.precio.value, ingredientes: aniadir.ingredientes.value, imagen: aniadir.image.value});
-
-            transaction.oncomplete = function(event) {
-                if(jsConfetti) jsConfetti.clearCanvas();
-                jsConfetti.addConfetti({
-                    emojis: ['🐸', '🍙', '🍖', '🍶', '🍻'],
-                    emojiSize: 50,
-                    confettiNumber: 80,
-                });
-
-                aniadir.reset();
-            }
-        });
-    }
-
-    //Modificar y eliminar
-    if(modificar){
-        const jsConfetti = new JSConfetti();
-
-        let transaction = db.transaction(["platos"], "readonly");
+    //Rellenar por primera vez el Select
+    select();
     
+    modificar.addEventListener("submit", (event) => { //botón modificar
+        event.preventDefault();
+
+        let transaction = db.transaction(["platos"], "readwrite");
         let objectStore = transaction.objectStore("platos");
 
-        let cursor = objectStore.openCursor();
-        select(cursor);
-        
-        modificar.addEventListener("submit", (event)=>{ //botón modificar
-            event.preventDefault();
-    
-            let transaction1 = db.transaction(["platos"], "readwrite");
-    
-            let objectStore1 = transaction1.objectStore("platos");
-    
-            objectStore1.put({id: parseInt(modificar.elegir.value), nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value}); //modifica datos
-            console.log({id: modificar.elegir.value, nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value});
+        const plato = {
+            id: parseInt(modificar.elegir.value),
+            nombre: modificar.nombre.value,
+            precio: modificar.precio.value,
+            ingredientes: modificar.ingredientes.value,
+            imagen: modificar.image.value
+        };
+        objectStore.put(plato); //modifica datos
 
-            transaction1.oncomplete = function(event) { //transacción exitosa
-                db.close();
-                if(jsConfetti) jsConfetti.clearCanvas();
-                jsConfetti.addConfetti({
-                    emojis: ['🐸', '🍙', '🍖', '🍶', '🍻'],
-                    emojiSize: 50,
-                    confettiNumber: 80,
-                });
+        transaction.oncomplete = function(event) { //transacción exitosa
+            console.log("Modificado correctamente el plato: ", plato.nombre, " con precio: ", plato.precio, "€");
+            if(jsConfetti) jsConfetti.clearCanvas();
+            jsConfetti.addConfetti({
+                emojis: ['🐸', '✅'],
+                emojiSize: 30,
+                confettiNumber: 80,
+            });
 
-                modificar.reset();
-            }
-        });
+            modificar.reset();
+            // Volver a rellenar el select
+            select();
+        }
+    });
 
         modificar.elimina.addEventListener("click", (event)=>{ //botón eliminar
             event.preventDefault();
 
             let transaction1 = db.transaction(["platos"], "readwrite");
-    
             let objectStore1 = transaction1.objectStore("platos");
 
-            let peticion = objectStore1.get(parseInt(modificar.elegir.value));
-            peticion.onsuccess = function(event){
-                objectStore1.delete(event.target.result.id); //elimina datos
-                let cursor = objectStore1.openCursor();
-                select(cursor);
-            }
+            objectStore1.delete(modificar.elegir.value); //elimina datos
+            select();
             
             transaction1.oncomplete = function(event) { //transacción exitosa
-                db.close();
                 if(jsConfetti) jsConfetti.clearCanvas();
                 jsConfetti.addConfetti({
-                    emojis: ['🐸', '🍙', '🍖', '🍶', '🍻'],
-                    emojiSize: 50,
+                    emojis: ['🐸', '🍙', '🍖', '🍶', '✅'],
+                    emojiSize: 30,
                     confettiNumber: 80,
                 });
 
                 modificar.reset();
             }
         });
-    }
-};
-
-function select(cursor){
-    let array=[];
+    function select(){
+        let transaction = db.transaction(["platos"], "readonly");
+        let objectStore = transaction.objectStore("platos");
+        let cursor = objectStore.openCursor();
+        let array=[];
+        cursor.onerror = function(event) {
+            console.log(event.target.errorCode)
+        }
         cursor.onsuccess = function(event){
             let datos = event.target.result;
+            console.log("Entrando cursor")
             if(datos){
-                console.log(datos.value);
                 array.push(datos.value);
                 datos.continue();
             } else{
@@ -144,7 +116,12 @@ function select(cursor){
                 });
             }
         }
+        transaction.oncomplete = function(event) { //transacción exitosa
+            console.log("Select terminado");
+        }
+    }
 }
+
 
 // Este evento solo se ejecuta en la primera creación de la base de datos o en el cambio de versión
 request.onupgradeneeded = function (event) {

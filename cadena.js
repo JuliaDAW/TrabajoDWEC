@@ -1,4 +1,3 @@
-
 if(!window.indexedDB){
     console.log("Tu navegador no soporta IndexedDB");
 }
@@ -27,20 +26,24 @@ request.onsuccess = function (event) {
 
             let objectStore = transaction.objectStore("platos");
 
-            objectStore.add({nombre: aniadir.nombre.value, precio: aniadir.precio.value, ingredientes: aniadir.ingredientes.value, imagen: aniadir.image.value});
-            console.log({nombre: aniadir.nombre.value, precio: aniadir.precio.value, ingredientes: aniadir.ingredientes.value, imagen: aniadir.image.value});
-            transaction.oncomplete = function(event) {
+            let comida = {nombre: aniadir.nombre.value, precio: aniadir.precio.value, ingredientes: aniadir.ingredientes.value, imagen: aniadir.image.value};
+            objectStore.add(comida); //añade datos
+            console.log(comida);
+
+            transaction.oncomplete = function(event) { //transacción exitosa
                 if(jsConfetti) jsConfetti.clearCanvas();
                 jsConfetti.addConfetti({
                     emojis: ['🐸', '🍙', '🍖', '🍶', '🍻'],
                     emojiSize: 50,
                     confettiNumber: 80,
                 });
+
+                aniadir.reset();
             }
         });
     }
 
-    //Modificar
+    //Modificar y eliminar
     let modificar=document.getElementById("id_modificar");
     if(modificar){
         let transaction = db.transaction(["platos"], "readonly");
@@ -52,14 +55,12 @@ request.onsuccess = function (event) {
         cursor.onsuccess = function(event){
             let datos = event.target.result;
             if(datos){
-                console.log(datos.value);
                 array.push(datos.value);
                 datos.continue();
             } else{
                 let elegir=document.getElementById("id_elegir");
                 array.forEach(comida =>{
                     elegir.innerHTML+=`<option value=${comida.id}>${comida.nombre}</option>`;
-                    console.log(comida);
                 });
 
                 elegir.addEventListener("change", (event)=>{
@@ -83,62 +84,52 @@ request.onsuccess = function (event) {
                 });
             }
         }
-
-        modificar.addEventListener("submit", (event)=>{
+        
+        modificar.addEventListener("submit", (event)=>{ //botón modificar
             event.preventDefault();
     
             let transaction1 = db.transaction(["platos"], "readwrite");
     
             let objectStore1 = transaction1.objectStore("platos");
     
-            objectStore1.put({id: parseInt(modificar.elegir.value), nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value});
-            console.log({id: modificar.elegir.value, nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value});
+            let comida = {id: parseInt(modificar.elegir.value), nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value};
+            objectStore1.put(comida); //modifica datos
+            console.log(comida);
+
+            //añadir confeti
+            modificar.reset();
         });
 
-        modificar.elimina.addEventListener("click", (event)=>{
+        modificar.elimina.addEventListener("click", (event)=>{ //botón eliminar
             event.preventDefault();
 
             let transaction1 = db.transaction(["platos"], "readwrite");
     
             let objectStore1 = transaction1.objectStore("platos");
 
-            objectStore1.delete(modificar.elegir.value);
+            let peticion = objectStore1.get(parseInt(modificar.elegir.value));
+            peticion.onsuccess = function(event){
+                objectStore1.delete(event.target.result.id); //elimina datos
+            }
+            
+            //hacer que el select se actualice solo
+
+            //añadir confeti
+            modificar.reset();
         });
     }
-
-    //get
-    /*let peticion = objectStore.get(2);
-    peticion.onsuccess=function(event){
-        console.log(event.target.result);
-    };
-    //delete
-    objectStore.delete(2);
-
-    
-    */
-/*
-    transaction.oncomplete = function(event) {
-        console.log("Transacción completada");
-        console.log(event);
-    };
-
-    transaction.onerror = function(event) {
-        console.log("Transacción no completada", event);
-    };
-*/
 };
 
-// Este evento solo se ejecuta en la primera creación de la base de datos//
-// o en el cambio de versión
+// Este evento solo se ejecuta en la primera creación de la base de datos o en el cambio de versión
 request.onupgradeneeded = function (event) {
     console.log("Actualizando la base de datos");
-    db = event.target.result;
+    const db = event.target.result;
 
     if(db.objectStoreNames.contains("platos")){ //si existe la elimina
         db.deleteObjectStore("platos");
     }
     // Crear un almacén de objetos para esta base de datos
-    //id autoincrementado
+    // id autoincrementado
     const objectStore = db.createObjectStore("platos", { keyPath: "id", autoIncrement: true });
     // Definir qué datos queremos guardar en el almacén de objetos
     objectStore.createIndex("nombre", "nombre", { unique: true });

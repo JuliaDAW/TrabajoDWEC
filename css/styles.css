@@ -16,16 +16,25 @@ input[type="text"] {
     font-size: 18px;
     width: 100%;
 }
-input[type="submit"] {
+input[type="submit"], input[type="reset"] {
     background: #000;
     color: #fff;
     cursor: pointer;
     border-radius: 5px;
     border: 1px solid black;
+    margin-right: 10px;
 }
 input[type="submit"]:hover {
     background: #fff;
     color: #000;
+}
+input[type="reset"]:hover {
+    background: #fff;
+    color: #000;
+}
+form div#botones {
+    display: flex;
+    justify-content: center;
 }
 body {
     display: flex;
@@ -43,20 +52,21 @@ form {
 }
 form div {
     margin-bottom: 10px;
-
 }
 button {
     padding: 5px;
 }
 a{
-    text-decoration:none;
-    margin:15px;
-    background-color:black;
-    color:white;
-    padding:20px;
-    border-radius:10px;
-    transition:all 0.5s;
+    text-decoration: none;
+    margin: 15px;
+    background-color: black;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    transition: all 0.5s;
+    border: 1px solid;
 }
 a:hover{
-    background-color:silver;
+    background-color: white;
+    color:black;
 }

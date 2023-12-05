@@ -26,11 +26,10 @@ request.onsuccess = function (event) {
 
             let objectStore = transaction.objectStore("platos");
 
-            let comida = {nombre: aniadir.nombre.value, precio: aniadir.precio.value, ingredientes: aniadir.ingredientes.value, imagen: aniadir.image.value};
-            objectStore.add(comida); //añade datos
-            console.log(comida);
+            objectStore.add({nombre: aniadir.nombre.value, precio: aniadir.precio.value, ingredientes: aniadir.ingredientes.value, imagen: aniadir.image.value}); //añade datos
+            console.log({nombre: aniadir.nombre.value, precio: aniadir.precio.value, ingredientes: aniadir.ingredientes.value, imagen: aniadir.image.value});
 
-            transaction.oncomplete = function(event) { //transacción exitosa
+            transaction.oncomplete = function(event) {
                 if(jsConfetti) jsConfetti.clearCanvas();
                 jsConfetti.addConfetti({
                     emojis: ['🐸', '🍙', '🍖', '🍶', '🍻'],
@@ -46,6 +45,8 @@ request.onsuccess = function (event) {
     //Modificar y eliminar
     let modificar=document.getElementById("id_modificar");
     if(modificar){
+        const jsConfetti = new JSConfetti();
+
         let transaction = db.transaction(["platos"], "readonly");
     
         let objectStore = transaction.objectStore("platos");
@@ -92,12 +93,19 @@ request.onsuccess = function (event) {
     
             let objectStore1 = transaction1.objectStore("platos");
     
-            let comida = {id: parseInt(modificar.elegir.value), nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value};
-            objectStore1.put(comida); //modifica datos
-            console.log(comida);
+            objectStore1.put({id: parseInt(modificar.elegir.value), nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value}); //modifica datos
+            console.log({id: modificar.elegir.value, nombre: modificar.nombre.value, precio: modificar.precio.value, ingredientes: modificar.ingredientes.value, imagen: modificar.image.value});
 
-            //añadir confeti
-            modificar.reset();
+            transaction1.oncomplete = function(event) { //transacción exitosa
+                if(jsConfetti) jsConfetti.clearCanvas();
+                jsConfetti.addConfetti({
+                    emojis: ['🐸', '🍙', '🍖', '🍶', '🍻'],
+                    emojiSize: 50,
+                    confettiNumber: 80,
+                });
+
+                modificar.reset();
+            }
         });
 
         modificar.elimina.addEventListener("click", (event)=>{ //botón eliminar
@@ -112,10 +120,18 @@ request.onsuccess = function (event) {
                 objectStore1.delete(event.target.result.id); //elimina datos
             }
             
-            //hacer que el select se actualice solo
+            //hacer que la página se actualice sola
 
-            //añadir confeti
-            modificar.reset();
+            transaction1.oncomplete = function(event) { //transacción exitosa
+                if(jsConfetti) jsConfetti.clearCanvas();
+                jsConfetti.addConfetti({
+                    emojis: ['🐸', '🍙', '🍖', '🍶', '🍻'],
+                    emojiSize: 50,
+                    confettiNumber: 80,
+                });
+
+                modificar.reset();
+            }
         });
     }
 };

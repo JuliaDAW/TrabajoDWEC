@@ -48,3 +48,15 @@ form div {
 button {
     padding: 5px;
 }
+a{
+    text-decoration:none;
+    margin:15px;
+    background-color:black;
+    color:white;
+    padding:20px;
+    border-radius:10px;
+    transition:all 0.5s;
+}
+a:hover{
+    background-color:silver;
+}

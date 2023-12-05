@@ -6,12 +6,15 @@
     <title>Document</title>
     <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="cadena.js" defer></script>
 </head>
 <body>
-    <form action="">
+    <form action="" id="id_modificar">
         <div>
-            <label for="elegir">Elegir</label>
-            <select name="elegir" id="elegir"></select>
+            <label for="elegir">Elegir:</label>
+            <select name="elegir" id="id_elegir">
+                <option>--Seleccione una opción--</option>
+            </select>
         </div>
         <div>
             <input type="text" name="nombre" placeholder="Elige para ver" disabled>
@@ -22,8 +25,9 @@
         <div>
             <input type="text" name="ingredientes" placeholder="Elige para ver" disabled>
         </div>
-        Imagen:<input type="file" name="image" accept="image/*" disabled>
-        <input type="submit" value="Modificar" disabled>
+        Imagen:<input type="text" name="image" accept="image/*" disabled>
+        <input type="submit" value="Modificar" name="modifica" disabled>
+        <input type="button" value="Eliminar" name="elimina" disabled>
     </form>
 </body>
 </html>

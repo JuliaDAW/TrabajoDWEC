@@ -40,6 +40,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     min-height: 100vh;
     font-family: 'Roboto', sans-serif;
     font-size: 20px;
@@ -65,8 +66,19 @@ a{
     border-radius: 10px;
     transition: all 0.5s;
     border: 1px solid;
+    width: 400px;
+    text-align: center;
 }
 a:hover{
     background-color: white;
     color:black;
+}
+.botones {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+h1 {
+    margin-bottom: 20px;
 }

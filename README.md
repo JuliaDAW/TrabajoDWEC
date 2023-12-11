@@ -2,4 +2,4 @@
 > [!NOTE]
 > Hecho por Julia L. y Fernando J.
 
-Página: `poner url gh pages`
+Página: ` https://juliadaw.github.io/TrabajoDWEC/`
